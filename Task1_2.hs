@@ -30,12 +30,18 @@ doesSquareBetweenExist from to = (floorSqrt (to - 1) - ceilingSqrt from) >= 0
 -- вискокосных годов?
 isDateCorrect :: Integer -> Integer -> Integer -> Bool
 isDateCorrect day month year
-        | day `elem` [1 .. [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] !! (fromIntegral month - 1)] = True
         | isLeapFebruary year month && day == 29 = True
-        | otherwise = False
+        | otherwise = isDateCorrect' month day
   where
     isLeapYear year = (year `rem` 4 == 0 && year `rem` 100 /= 0) || (year `rem` 400 == 0)
     isLeapFebruary year month = month == 2 && isLeapYear year
+
+isDateCorrect' :: Integer -> Integer -> Bool
+isDateCorrect' month day =
+    case month of
+        x | elem x [1, 3, 5, 7, 8, 10, 12] && day <= 31 -> True
+        x | elem x [4, 6, 9, 11] && day <= 30 -> True
+        otherwise -> False
 
 -- возведение числа в степень, duh
 -- готовые функции и плавающую арифметику использовать нельзя
@@ -43,7 +49,10 @@ pow :: Integer -> Integer -> Integer
 pow x y
         | y == 0 = 1
         | y == 1 = x
-        | otherwise = x * pow x (y - 1)
+        | even y = pow z (y `div` 2)
+        | otherwise = x * (pow z ((y - 1) `div` 2))
+        where
+            z = x * x
 
 -- является ли данное число простым?
 isPrime :: Integer -> Bool
