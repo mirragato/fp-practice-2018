@@ -25,16 +25,18 @@ infixl 2 |*|
 -- Заменить переменную `varName` на `replacement`
 -- во всём выражении `expression`
 replaceVar :: String -> Term -> Term -> Term
-replaceVar varName replacement expression = case (expression) of
-    Variable var | var == varName -> replacement
-    BinaryTerm lhv operation rhv -> BinaryTerm (replaceVar varName replacement lhv) operation (replaceVar varName replacement rhv)
-    _ -> expression
+replaceVar varName replacement expression =
+    let replace x = replaceVar varName replacement x in
+        case expression of
+            Variable var | var == varName -> replacement
+            BinaryTerm lhv operation rhv -> BinaryTerm (replace lhv) operation (replace rhv)
+            _ -> expression
 
 -- Посчитать значение выражения `Term`
 -- если оно состоит только из констант
 evaluate :: Term -> Term
 evaluate expression = case expression of
-    BinaryTerm lhv operation rhv -> case (evaluate(lhv), operation, evaluate(rhv)) of
+    BinaryTerm lhv operation rhv -> case (l, operation, r) of
         (IntConstant l, Plus, IntConstant r) -> IntConstant (l + r)
         (IntConstant 0, Plus, r) -> r
         (l, Plus, IntConstant 0) -> l
@@ -45,4 +47,8 @@ evaluate expression = case expression of
         (IntConstant 1, Multiply, r) -> r
         (l, Multiply, IntConstant 0) -> IntConstant 0
         (l, Multiply, IntConstant 1) -> l
-        _ -> expression
+        _ -> BinaryTerm l operation r
+        where
+            l = evaluate(lhv)
+            r = evaluate(rhv)
+    _ -> expression
