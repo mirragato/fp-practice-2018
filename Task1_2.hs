@@ -39,6 +39,7 @@ isDateCorrect day month year
 isDateCorrect' :: Integer -> Integer -> Bool
 isDateCorrect' month day =
     case month of
+        x | x == 2 && day <= 28 -> True
         x | elem x [1, 3, 5, 7, 8, 10, 12] && day <= 31 -> True
         x | elem x [4, 6, 9, 11] && day <= 30 -> True
         otherwise -> False
