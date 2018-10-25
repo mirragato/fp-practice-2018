@@ -37,11 +37,7 @@ product = foldr (*) 1
 
 -- Выделение из списка Maybe всех существующих значений
 catMaybes :: [Maybe a] -> [a]
-catMaybes = foldr (\x acc -> if isJust x then (maybeToList x) ++ acc else acc) []
-
-isJust :: Maybe a -> Bool
-isJust (Just x) = True
-isJust _ = False
+catMaybes = foldr (\x acc -> (maybeToList x) ++ acc) []
 
 maybeToList :: Maybe a -> [a]
 maybeToList Nothing = []
