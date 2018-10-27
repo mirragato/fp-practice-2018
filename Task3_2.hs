@@ -37,6 +37,9 @@ instance Monoid (ReverseList a)
         mappend l RNil = l
         mappend l (RCons t h) = RCons (mappend l t) h
 
+instance Semigroup (ReverseList a) where
+    (<>) l r = mappend l r
+
 instance Functor ReverseList
     where
         fmap f RNil = RNil
