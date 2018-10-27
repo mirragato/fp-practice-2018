@@ -23,6 +23,10 @@ instance Monoid (PSet2 a) where
 instance Semigroup (PSet2 a) where
     (<>) l r = mappend l r
 
+
+-- Разность множеств (A && not B) реализовать нельзя, ведь не выполняется
+-- основной закон моноида: x `mappend` mzero === mzero `mappend` x === x
+
 -- симметрическая разность
 instance Monoid (PSet3 a) where
   mempty = PSet3 (\a -> False)
