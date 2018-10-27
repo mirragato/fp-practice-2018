@@ -2,11 +2,11 @@ module Task5_1 where
 
 import Todo(todo)
 
-data DList a = DNil 
-             | DCons { 
-                left :: (DList a), 
-                current :: a, 
-                right :: (DList a) 
+data DList a = DNil
+             | DCons {
+                left :: (DList a),
+                current :: a,
+                right :: (DList a)
              }
 
 instance (Show a) => Show (DList a) where
@@ -25,15 +25,30 @@ list2dlist lst = list2dlist' DNil lst
 
 list2dlist' :: DList a -> [a] -> DList a
 list2dlist' _ [] = DNil
-list2dlist' left (h: t) = 
+list2dlist' left (h: t) =
     let rec = DCons left h (list2dlist' rec t)
     in rec
 
 index :: DList a -> Int -> a
-index = todo
+index _ n | n < 0 = error "Index out of range"
+index DNil _ = error "DList is empty"
+index (DCons _ val _) 0 = val
+index (DCons _ val t) n = index t (n - 1)
 
 insertAt :: DList a -> Int -> a -> DList a
-insertAt list index value = todo
+insertAt _ index _ | index < 0 = error "Index out of range"
+insertAt DNil 0 value = DCons DNil value DNil
+insertAt DNil _ _ = error "Index out of range"
+insertAt (DCons b val t) 0 value = insertAt'
+    where
+        insertAt' = DCons b value (DCons insertAt' val t)
+insertAt (DCons b val t) index value = DCons b val $ insertAt t (index - 1) value
 
 removeAt :: DList a -> Int -> DList a
-removeAt list index = todo
+removeAt _ index | index < 0 = error "Index out of range"
+removeAt (DCons b val t@(DCons _ val2 t2)) index
+    | index == 0 = DCons b val2 t2
+    | otherwise = DCons b val $ removeAt t (index - 1)
+removeAt list@(DCons _ _ DNil) index
+    | index == 0 = DNil
+    | otherwise = list
