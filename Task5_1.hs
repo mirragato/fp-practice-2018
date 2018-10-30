@@ -37,18 +37,28 @@ index (DCons _ val t) n = index t (n - 1)
 
 insertAt :: DList a -> Int -> a -> DList a
 insertAt _ index _ | index < 0 = error "Index out of range"
-insertAt DNil 0 value = DCons DNil value DNil
-insertAt DNil _ _ = error "Index out of range"
-insertAt (DCons b val t) 0 value = insertAt'
+insertAt list index value = insertAt' list index value
+
+insertAt' :: DList a -> Int -> a -> DList a
+insertAt' DNil 0 value = DCons DNil value DNil
+insertAt' DNil _ _ = error "Index out of range"
+insertAt' (DCons b val DNil) 0 value = rec
     where
-        insertAt' = DCons b value (DCons insertAt' val t)
-insertAt (DCons b val t) index value = DCons b val $ insertAt t (index - 1) value
+        rec = DCons b value right
+        right = DCons rec val DNil
+insertAt' (DCons b val (DCons _ rh rt)) 0 value = rec
+    where
+        rec = DCons b value newright
+        newright = DCons rec val (DCons newright rh rt)
+insertAt' (DCons b val t) index value = DCons b val $ insertAt' t (index - 1) value
+
 
 removeAt :: DList a -> Int -> DList a
 removeAt _ index | index < 0 = error "Index out of range"
-removeAt (DCons b val t@(DCons _ val2 t2)) index
-    | index == 0 = DCons b val2 t2
-    | otherwise = DCons b val $ removeAt t (index - 1)
-removeAt list@(DCons _ _ DNil) index
-    | index == 0 = DNil
-    | otherwise = list
+removeAt list index = removeAt' list index
+
+removeAt' :: DList a -> Int -> DList a
+removeAt' (DCons _ _ DNil) 0 = DNil
+removeAt' (DCons _ _ DNil) _ = error "Index out of range"
+removeAt' (DCons b _ (DCons _ rh rt)) 0 = DCons b rh rt
+removeAt' (DCons b val t) index = DCons b val $ removeAt' t (index - 1)
